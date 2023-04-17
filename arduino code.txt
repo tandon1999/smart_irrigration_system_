@@ -1,0 +1,53 @@
+#include <OneWire.h>
+#include <SPI.h>
+#include <DHT.h>
+#include <DallasTemperature.h>
+#define ONE_WIRE_BUS D4
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+#define DHTPIN 2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+SimpleTimer timer;
+void sendSensor()
+{
+float h = dht.readHumidity();
+float t = dht.readTemperature();
+return;
+}
+void setup()
+{
+Serial.begin(9600);
+dht.begin();
+timer.setInterval(1000L, sendSensor);
+sensors.begin();
+}
+int sensor=0;
+int output=0;
+void sendTemps()
+{
+sensor=analogRead(A0);
+Serial.println(sensor);
+output=(145-map(sensor,0,1023,0,100)); //in place 145 there is 
+100(it change with the change in sensor)
+delay(1000);
+sensors.requestTemperatures();
+float temp = sensors.getTempCByIndex(0);
+if(output<60)
+{
+ Serial.println("Moisture is low, please supply water");
+}
+else
+{
+ Serial.println("Moisture is good, No need of water supply");
+}
+Serial.print("moisture = ");
+Serial.print(output);
+Serial.println("%");
+delay(1000);
+}
+void loop()
+{
+timer.run();
+sendTemps();
+}
